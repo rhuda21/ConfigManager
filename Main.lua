@@ -200,7 +200,7 @@ downloadBtn.MouseButton1Click:Connect(function()
 end)
 
 playBtn.MouseButton1Click:Connect(function()
-    Config.exec
+    Config.exec()
 end)
 
 closeBtn.MouseButton1Click:Connect(function()
