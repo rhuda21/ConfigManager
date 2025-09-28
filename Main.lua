@@ -13,19 +13,16 @@ local function PasteAPI(action, file)
             Body = "content=" .. content .. "&syntax=text&expiry_days=7"
         })
         if response.StatusCode == 201 and response.Body then
-            setclipboard(response.Body)
-            return response.Body
+            local cleanUrl = string.match(response.Body, "^%s*(.-)%s*$")
+            local finalUrl = cleanUrl .. ".txt"
+            setclipboard(finalUrl)
+            return finalUrl
         else
             return nil
         end
     elseif action == "Download" then
-        -- Ensure .txt is appended for raw content
-        local rawUrl = file
-        if not rawUrl:match("%.txt$") then
-            rawUrl = rawUrl .. ".txt"
-        end
         local response = request({
-            Url = rawUrl,
+            Url = file,
             Method = "GET"
         })
         if response.StatusCode == 200 and response.Body then
@@ -112,13 +109,30 @@ local downloadCorner = Instance.new("UICorner")
 downloadCorner.CornerRadius = UDim.new(0, 8)
 downloadCorner.Parent = downloadBtn
 
-local function notify(msg, duration)
+-- Close Button
+local closeBtn = Instance.new("TextButton")
+closeBtn.Name = "CloseButton"
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 32, 0, 32)
+closeBtn.Position = UDim2.new(1, -36, 0, 4)
+closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.Font = Enum.Font.SourceSansBold
+closeBtn.TextSize = 22
+closeBtn.Parent = windowFrame
+closeBtn.BackgroundTransparency = 0.1
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 8)
+closeCorner.Parent = closeBtn
+
+local function notify(msg, duration, color)
     duration = duration or 2
     local notif = Instance.new("TextLabel")
     notif.Text = msg
     notif.Size = UDim2.new(1, 0, 0, 30)
     notif.Position = UDim2.new(0, 0, 0, -35)
-    notif.BackgroundColor3 = Color3.fromRGB(60, 120, 200)
+    notif.BackgroundColor3 = color or Config.Theme.Accent
     notif.TextColor3 = Color3.fromRGB(255,255,255)
     notif.Font = Enum.Font.SourceSansBold
     notif.TextSize = 18
@@ -142,7 +156,7 @@ exportBtn.MouseButton1Click:Connect(function()
         if isfile(path) then
             local pasteUrl = PasteAPI("Export", path)
             if pasteUrl then
-                notify("Config exported! URL:  On Clipboard " .. pasteUrl)
+                notify("Config exported! On Clipboard " .. pasteUrl)
             end
         else
             notify("Config file not found at path: " .. path)
@@ -165,4 +179,8 @@ downloadBtn.MouseButton1Click:Connect(function()
     else
         notify("Failed to download config.")
     end
+end)
+
+closeBtn.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
 end)
