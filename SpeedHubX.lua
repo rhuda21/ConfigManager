@@ -4,7 +4,7 @@ Config.path = "SpeedHubX"
 Config.Theme = {
     Background = Color3.fromRGB(20, 20, 20),
     Glow = Color3.fromRGB(255, 255, 255),
-    Accent = Color3.fromRGB(10, 10, 10),
+    Accent = Color3.fromRGB(151, 17, 17),
     LightContrast = Color3.fromRGB(30, 30, 30),
     DarkContrast = Color3.fromRGB(15, 15, 15),
 

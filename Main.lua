@@ -1,6 +1,40 @@
 local dir = "https://raw.githubusercontent.com/rhuda21/ConfigManager/refs/heads/main/"
 local Config = loadstring(game:HttpGet(dir .. _G.Script))()
 
+local function PasteAPI(action, file)
+    if action == "Export" then
+        local content = readfile(file)
+        local response = request({
+            Url = "https://dpaste.com/api/",
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/x-www-form-urlencoded"
+            },
+            Body = "content=" .. content .. "&syntax=text&expiry_days=7"
+        })
+        if response.StatusCode == 201 and response.Body then
+            setclipboard(response.Body)
+            return response.Body
+        else
+            return nil
+        end
+    elseif action == "Download" then
+        -- Ensure .txt is appended for raw content
+        local rawUrl = file
+        if not rawUrl:match("%.txt$") then
+            rawUrl = rawUrl .. ".txt"
+        end
+        local response = request({
+            Url = rawUrl,
+            Method = "GET"
+        })
+        if response.StatusCode == 200 and response.Body then
+            return response.Body
+        else
+            return nil
+        end
+    end
+end
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ConfigUI"
@@ -78,22 +112,57 @@ local downloadCorner = Instance.new("UICorner")
 downloadCorner.CornerRadius = UDim.new(0, 8)
 downloadCorner.Parent = downloadBtn
 
+local function notify(msg, duration)
+    duration = duration or 2
+    local notif = Instance.new("TextLabel")
+    notif.Text = msg
+    notif.Size = UDim2.new(1, 0, 0, 30)
+    notif.Position = UDim2.new(0, 0, 0, -35)
+    notif.BackgroundColor3 = Color3.fromRGB(60, 120, 200)
+    notif.TextColor3 = Color3.fromRGB(255,255,255)
+    notif.Font = Enum.Font.SourceSansBold
+    notif.TextSize = 18
+    notif.Parent = windowFrame
+    notif.BackgroundTransparency = 0.1
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = notif
+    notif:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.25, true)
+    task.delay(duration, function()
+        notif:TweenPosition(UDim2.new(0, 0, 0, -35), "In", "Quad", 0.25, true)
+        task.wait(0.3)
+        notif:Destroy()
+    end)
+end
+
 exportBtn.MouseButton1Click:Connect(function()
     local gameId = game.PlaceId
     local path = Config.Games[gameId]
     if path then
         if isfile(path) then
-            local f = readfile(path)
-            setclipboard(f)
+            local pasteUrl = PasteAPI("Export", path)
+            if pasteUrl then
+                notify("Config exported! URL:  On Clipboard " .. pasteUrl)
+            end
         else
-            print("Config file not found at path:", path)
+            notify("Config file not found at path: " .. path)
         end
     else
-        print("No config found for this gameid:", gameId)
+        notify("This game is unsupported: " .. gameId)
     end
 end)
 
 downloadBtn.MouseButton1Click:Connect(function()
     local url = urlBox.Text
-    print("Download from URL:", url)
+    local c = PasteAPI("Download", url)
+    if c then
+        local gameid = game.PlaceId
+        local path = Config.Games[gameid]
+        if path then
+            writefile(path,c)
+            notify("Config downloaded and saved!")
+        end
+    else
+        notify("Failed to download config.")
+    end
 end)
