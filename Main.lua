@@ -97,17 +97,35 @@ urlCorner.Parent = urlBox
 local downloadBtn = Instance.new("TextButton")
 downloadBtn.Name = "DownloadButton"
 downloadBtn.Text = "Download"
-downloadBtn.Size = UDim2.new(0, 200, 0, 40)
+downloadBtn.Size = UDim2.new(0, 140, 0, 40)
 downloadBtn.Position = UDim2.new(0, 80, 0, 150)
 downloadBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 120)
 downloadBtn.TextColor3 = Color3.fromRGB(255,255,255)
 downloadBtn.Font = Enum.Font.SourceSans
 downloadBtn.TextSize = 20
 downloadBtn.Parent = windowFrame
+downloadBtn.BackgroundTransparency = 0.1
 
 local downloadCorner = Instance.new("UICorner")
 downloadCorner.CornerRadius = UDim.new(0, 8)
 downloadCorner.Parent = downloadBtn
+
+-- Play Button
+local playBtn = Instance.new("TextButton")
+playBtn.Name = "PlayButton"
+playBtn.Text = "▶️"
+playBtn.Size = UDim2.new(0, 50, 0, 40)
+playBtn.Position = UDim2.new(0, 230, 0, 150)
+playBtn.BackgroundColor3 = Color3.fromRGB(120, 200, 60)
+playBtn.TextColor3 = Color3.fromRGB(255,255,255)
+playBtn.Font = Enum.Font.SourceSansBold
+playBtn.TextSize = 20
+playBtn.Parent = windowFrame
+playBtn.BackgroundTransparency = 0.1
+
+local playCorner = Instance.new("UICorner")
+playCorner.CornerRadius = UDim.new(0, 8)
+playCorner.Parent = playBtn
 
 -- Close Button
 local closeBtn = Instance.new("TextButton")
@@ -179,6 +197,10 @@ downloadBtn.MouseButton1Click:Connect(function()
     else
         notify("Failed to download config.")
     end
+end)
+
+playBtn.MouseButton1Click:Connect(function()
+    Config.exec
 end)
 
 closeBtn.MouseButton1Click:Connect(function()
