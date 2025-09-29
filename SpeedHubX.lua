@@ -1,5 +1,6 @@
 local Config = {}
 Config.path = "SpeedHubX"
+Config.SystemPath = "SHXConfigs"
 
 Config.Theme = {
     Background = Color3.fromRGB(20, 20, 20),
