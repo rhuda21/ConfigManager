@@ -84,11 +84,13 @@ local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ConfigUI"
 screenGui.Parent = cloneref(gethui()) or game:GetService("CoreGui")
 
+local theme = Config.Theme
+
 local windowFrame = Instance.new("Frame")
 windowFrame.Name = "WindowFrame"
 windowFrame.Size = UDim2.new(0, 360, 0, 220)
 windowFrame.Position = UDim2.new(0, 40, 0, 40)
-windowFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+windowFrame.BackgroundColor3 = theme.AcrylicMain or Color3.fromRGB(40, 40, 40)
 windowFrame.BorderSizePixel = 0
 windowFrame.Parent = screenGui
 windowFrame.Draggable = true
@@ -102,7 +104,7 @@ titleLabel.Name = "TitleLabel"
 titleLabel.Text = "Config Manager"
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 24
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextColor3 = theme.Text or Color3.fromRGB(255, 255, 255)
 titleLabel.BackgroundTransparency = 1
 titleLabel.Size = UDim2.new(1, 0, 0, 40)
 titleLabel.Position = UDim2.new(0, 0, 0, 0)
@@ -114,8 +116,8 @@ exportBtn.Name = "ExportButton"
 exportBtn.Text = "EXPORT config"
 exportBtn.Size = UDim2.new(0, 200, 0, 40)
 exportBtn.Position = UDim2.new(0, 80, 0, 50)
-exportBtn.BackgroundColor3 = Color3.fromRGB(60, 120, 200)
-exportBtn.TextColor3 = Color3.fromRGB(255,255,255)
+exportBtn.BackgroundColor3 = theme.Accent or Color3.fromRGB(60, 120, 200)
+exportBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
 exportBtn.Font = Enum.Font.SourceSans
 exportBtn.TextSize = 20
 exportBtn.Parent = windowFrame
@@ -130,8 +132,8 @@ urlBox.Name = "URLInput"
 urlBox.PlaceholderText = "Enter config URL..."
 urlBox.Size = UDim2.new(0, 320, 0, 32)
 urlBox.Position = UDim2.new(0, 20, 0, 100)
-urlBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-urlBox.TextColor3 = Color3.fromRGB(255,255,255)
+urlBox.BackgroundColor3 = theme.Input or Color3.fromRGB(50, 50, 50)
+urlBox.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
 urlBox.Font = Enum.Font.SourceSans
 urlBox.TextSize = 18
 urlBox.Parent = windowFrame
@@ -140,22 +142,62 @@ local urlCorner = Instance.new("UICorner")
 urlCorner.CornerRadius = UDim.new(0, 6)
 urlCorner.Parent = urlBox
 
--- Download Button
+-- Download Button (Replace)
 local downloadBtn = Instance.new("TextButton")
 downloadBtn.Name = "DownloadButton"
 downloadBtn.Text = "Download"
-downloadBtn.Size = UDim2.new(0, 140, 0, 40)
+downloadBtn.Size = UDim2.new(0, 110, 0, 40)
 downloadBtn.Position = UDim2.new(0, 80, 0, 150)
-downloadBtn.BackgroundColor3 = Color3.fromRGB(60, 200, 120)
-downloadBtn.TextColor3 = Color3.fromRGB(255,255,255)
+downloadBtn.BackgroundColor3 = theme.Element or Color3.fromRGB(60, 200, 120)
+downloadBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
 downloadBtn.Font = Enum.Font.SourceSans
 downloadBtn.TextSize = 20
 downloadBtn.Parent = windowFrame
-downloadBtn.BackgroundTransparency = 0.1
+downloadBtn.BackgroundTransparency = theme.ElementTransparency or 0.1
 
 local downloadCorner = Instance.new("UICorner")
 downloadCorner.CornerRadius = UDim.new(0, 8)
 downloadCorner.Parent = downloadBtn
+
+-- New Download Button (Create New)
+local downloadNewBtn = Instance.new("TextButton")
+downloadNewBtn.Name = "DownloadNewButton"
+downloadNewBtn.Text = "⬇️"
+downloadNewBtn.Size = UDim2.new(0, 32, 0, 40)
+downloadNewBtn.Position = UDim2.new(0, 196, 0, 150)
+downloadNewBtn.BackgroundColor3 = theme.DropdownOption or Color3.fromRGB(60, 180, 220)
+downloadNewBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
+downloadNewBtn.Font = Enum.Font.SourceSansBold
+downloadNewBtn.TextSize = 22
+downloadNewBtn.Parent = windowFrame
+downloadNewBtn.BackgroundTransparency = theme.ElementTransparency or 0.1
+
+local downloadNewCorner = Instance.new("UICorner")
+downloadNewCorner.CornerRadius = UDim.new(0, 8)
+downloadNewCorner.Parent = downloadNewBtn
+
+downloadNewBtn.MouseButton1Click:Connect(function()
+    local url = urlBox.Text
+    local c = PasteAPI("Download", url)
+    if c then
+        local folder = Config.SystemPath or "configs"
+        if not isfolder(folder) then makefolder(folder) end
+        local gameid = game.PlaceId
+        local files = listfiles(folder)
+        local count = 0
+        for _, file in ipairs(files) do
+            local fname = file:match("[^\\/]+$")
+            if fname:find(tostring(gameid)) then
+                count = count + 1
+            end
+        end
+        local newPath = folder .. "/" .. tostring(gameid) .. "_" .. tostring(count + 1)
+        writefile(newPath, c)
+        UIFuncs.Notify("Config downloaded as new file: " .. newPath)
+    else
+        UIFuncs.Notify("Failed to download config.")
+    end
+end)
 
 -- Play Button
 local playBtn = Instance.new("TextButton")
@@ -163,12 +205,12 @@ playBtn.Name = "PlayButton"
 playBtn.Text = "▶️"
 playBtn.Size = UDim2.new(0, 50, 0, 40)
 playBtn.Position = UDim2.new(0, 230, 0, 150)
-playBtn.BackgroundColor3 = Color3.fromRGB(120, 200, 60)
-playBtn.TextColor3 = Color3.fromRGB(255,255,255)
+playBtn.BackgroundColor3 = theme.ToggleSlider or Color3.fromRGB(120, 200, 60)
+playBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
 playBtn.Font = Enum.Font.SourceSansBold
 playBtn.TextSize = 20
 playBtn.Parent = windowFrame
-playBtn.BackgroundTransparency = 0.1
+playBtn.BackgroundTransparency = theme.ElementTransparency or 0.1
 
 local playCorner = Instance.new("UICorner")
 playCorner.CornerRadius = UDim.new(0, 8)
@@ -180,12 +222,12 @@ closeBtn.Name = "CloseButton"
 closeBtn.Text = "X"
 closeBtn.Size = UDim2.new(0, 32, 0, 32)
 closeBtn.Position = UDim2.new(1, -36, 0, 4)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
-closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
+closeBtn.BackgroundColor3 = theme.DialogButtonBorder or Color3.fromRGB(200, 60, 60)
+closeBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
 closeBtn.Font = Enum.Font.SourceSansBold
 closeBtn.TextSize = 22
 closeBtn.Parent = windowFrame
-closeBtn.BackgroundTransparency = 0.1
+closeBtn.BackgroundTransparency = theme.ElementTransparency or 0.1
 
 local closeCorner = Instance.new("UICorner")
 closeCorner.CornerRadius = UDim.new(0, 8)
@@ -196,83 +238,132 @@ binBtn.Name = "Bin"
 binBtn.Text = "🗑️"
 binBtn.Size = UDim2.new(0, 50, 0, 40)
 binBtn.Position = UDim2.new(0, 290, 0, 150)
-binBtn.BackgroundColor3 = Color3.fromRGB(200, 80, 80)
-binBtn.TextColor3 = Color3.fromRGB(255,255,255)
+binBtn.BackgroundColor3 = theme.DialogButtonBorder or Color3.fromRGB(200, 80, 80)
+binBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
 binBtn.Font = Enum.Font.SourceSansBold
 binBtn.TextSize = 20
 binBtn.Parent = windowFrame
-binBtn.BackgroundTransparency = 0.1
+binBtn.BackgroundTransparency = theme.ElementTransparency or 0.1
 
 local binCorner = Instance.new("UICorner")
 binCorner.CornerRadius = UDim.new(0, 8)
 binCorner.Parent = binBtn
 
--- Tabs container
-local tabsFrame = Instance.new("Frame")
-tabsFrame.Name = "TabsFrame"
-tabsFrame.Size = UDim2.new(1, 0, 0, 36)
-tabsFrame.Position = UDim2.new(0, 0, 0, 0)
-tabsFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-tabsFrame.BorderSizePixel = 0
-tabsFrame.Parent = windowFrame
-tabsFrame.ZIndex = 2
+local fileManagerBtn = Instance.new("TextButton")
+fileManagerBtn.Name = "FileManagerButton"
+fileManagerBtn.Text = "Files"
+fileManagerBtn.Size = UDim2.new(0, 60, 0, 32)
+fileManagerBtn.Position = UDim2.new(1, -100, 0, 4)
+fileManagerBtn.BackgroundColor3 = theme.Tab or Color3.fromRGB(80, 120, 200)
+fileManagerBtn.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
+fileManagerBtn.Font = Enum.Font.SourceSansBold
+fileManagerBtn.TextSize = 18
+fileManagerBtn.Parent = windowFrame
+fileManagerBtn.BackgroundTransparency = theme.ElementTransparency or 0.1
 
-local tabsCorner = Instance.new("UICorner")
-tabsCorner.CornerRadius = UDim.new(0, 12)
-tabsCorner.Parent = tabsFrame
-
--- Tab buttons
-local tabNames = {"Config", "Settings"}
-local tabButtons = {}
-
-for i, name in ipairs(tabNames) do
-    local tabBtn = Instance.new("TextButton")
-    tabBtn.Name = name .. "Tab"
-    tabBtn.Text = name
-    tabBtn.Size = UDim2.new(0, 100, 1, 0)
-    tabBtn.Position = UDim2.new(0, (i-1)*110, 0, 0)
-    tabBtn.BackgroundColor3 = i == 1 and Color3.fromRGB(60,120,200) or Color3.fromRGB(50,50,50)
-    tabBtn.TextColor3 = Color3.fromRGB(255,255,255)
-    tabBtn.Font = Enum.Font.SourceSansBold
-    tabBtn.TextSize = 18
-    tabBtn.Parent = tabsFrame
-    tabBtn.ZIndex = 3
-
-    local tabBtnCorner = Instance.new("UICorner")
-    tabBtnCorner.CornerRadius = UDim.new(0, 8)
-    tabBtnCorner.Parent = tabBtn
-
-    tabButtons[i] = tabBtn
-end
-
--- Hide/show content based on tab
-local function showTab(idx)
-    for i, btn in ipairs(tabButtons) do
-        btn.BackgroundColor3 = i == idx and Color3.fromRGB(60,120,200) or Color3.fromRGB(50,50,50)
-    end
-    -- Example: Hide all except config tab (add more tab content as needed)
-    local showConfig = idx == 1
-    exportBtn.Visible = showConfig
-    downloadBtn.Visible = showConfig
-    playBtn.Visible = showConfig
-    binBtn.Visible = showConfig
-    urlBox.Visible = showConfig
-    -- Add more tab content visibility logic here
-end
-
-for i, btn in ipairs(tabButtons) do
-    btn.MouseButton1Click:Connect(function()
-        showTab(i)
-    end)
-end
-
-showTab(1)
-
--- Move titleLabel below tabs
-titleLabel.Position = UDim2.new(0, 0, 0, 36)
-titleLabel.Size = UDim2.new(1, 0, 0, 40)
+local fileManagerCorner = Instance.new("UICorner")
+fileManagerCorner.CornerRadius = UDim.new(0, 8)
+fileManagerCorner.Parent = fileManagerBtn
 
 -- Functions UI
+UIFuncs.ShowFileManager = function()
+    if windowFrame:FindFirstChild("Frame") then return end
+    local fmFrame = Instance.new("Frame")
+    fmFrame.Size = UDim2.new(0, 320, 0, 180)
+    fmFrame.Position = UDim2.new(0.5, -160, 0.5, -90)
+    fmFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    fmFrame.Parent = windowFrame
+    fmFrame.ZIndex = 20
+    local fmCorner = Instance.new("UICorner")
+    fmCorner.CornerRadius = UDim.new(0, 10)
+    fmCorner.Parent = fmFrame
+    local fmTitle = Instance.new("TextLabel")
+    fmTitle.Text = "Config Files"
+    fmTitle.Size = UDim2.new(1, 0, 0, 32)
+    fmTitle.Position = UDim2.new(0, 0, 0, 0)
+    fmTitle.BackgroundTransparency = 1
+    fmTitle.TextColor3 = Color3.fromRGB(255,255,255)
+    fmTitle.Font = Enum.Font.SourceSansBold
+    fmTitle.TextSize = 20
+    fmTitle.Parent = fmFrame
+    fmTitle.ZIndex = 21
+    local closeFMBtn = Instance.new("TextButton")
+    closeFMBtn.Text = "X"
+    closeFMBtn.Size = UDim2.new(0, 32, 0, 32)
+    closeFMBtn.Position = UDim2.new(1, -36, 0, 4)
+    closeFMBtn.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+    closeFMBtn.TextColor3 = Color3.fromRGB(255,255,255)
+    closeFMBtn.Font = Enum.Font.SourceSansBold
+    closeFMBtn.TextSize = 18
+    closeFMBtn.Parent = fmFrame
+    closeFMBtn.ZIndex = 21
+    local closeFMCorner = Instance.new("UICorner")
+    closeFMCorner.CornerRadius = UDim.new(0, 8)
+    closeFMCorner.Parent = closeFMBtn
+    closeFMBtn.MouseButton1Click:Connect(function()
+        fmFrame:Destroy()
+    end)
+    local filesList = Instance.new("ScrollingFrame")
+    filesList.Size = UDim2.new(1, -20, 1, -42)
+    filesList.Position = UDim2.new(0, 10, 0, 38)
+    filesList.BackgroundTransparency = 1
+    filesList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    filesList.ScrollBarThickness = 6
+    filesList.Parent = fmFrame
+    filesList.ZIndex = 21
+    local configFolder = Config.SystemPath or "configs"
+    local files = listfiles(configFolder)
+    local y = 0
+    for _, file in ipairs(files) do
+        local fname = file:match("[^\\/]+$")
+        local fileBtn = Instance.new("TextButton")
+        fileBtn.Text = fname
+        fileBtn.Size = UDim2.new(0.7, -10, 0, 28)
+        fileBtn.Position = UDim2.new(0, 0, 0, y)
+        fileBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+        fileBtn.TextColor3 = Color3.fromRGB(255,255,255)
+        fileBtn.Font = Enum.Font.SourceSans
+        fileBtn.TextSize = 16
+        fileBtn.Parent = filesList
+        fileBtn.ZIndex = 22
+        local fileBtnCorner = Instance.new("UICorner")
+        fileBtnCorner.CornerRadius = UDim.new(0, 6)
+        fileBtnCorner.Parent = fileBtn
+
+        local loadBtn = Instance.new("TextButton")
+        loadBtn.Text = "Load"
+        loadBtn.Size = UDim2.new(0.3, -6, 0, 28)
+        loadBtn.Position = UDim2.new(0.7, 4, 0, y)
+        loadBtn.BackgroundColor3 = Color3.fromRGB(60, 120, 200)
+        loadBtn.TextColor3 = Color3.fromRGB(255,255,255)
+        loadBtn.Font = Enum.Font.SourceSansBold
+        loadBtn.TextSize = 16
+        loadBtn.Parent = filesList
+        loadBtn.ZIndex = 22
+        local loadBtnCorner = Instance.new("UICorner")
+        loadBtnCorner.CornerRadius = UDim.new(0, 6)
+        loadBtnCorner.Parent = loadBtn
+
+        fileBtn.MouseButton1Click:Connect(function()
+            setclipboard(file)
+            UIFuncs.Notify("Path copied to clipboard:\n" .. file)
+        end)
+        loadBtn.MouseButton1Click:Connect(function()
+            local gameid = game.PlaceId
+            local defaultPath = Config.Games[gameid]
+            if defaultPath then
+                local content = readfile(file)
+                writefile(defaultPath, content)
+                UIFuncs.Notify("Loaded config:\n" .. fname .. "\nNow Load Script with the ▶️ button.")
+            else
+                UIFuncs.Notify("No default path for this game.")
+            end
+        end)
+        y = y + 32
+    end
+    filesList.CanvasSize = UDim2.new(0, 0, 0, y)
+end
+fileManagerBtn.MouseButton1Click:Connect(UIFuncs.ShowFileManager)
 
 UIFuncs.confirm = function(msg, yesText, noText, onYes, onNo)
     yesText = yesText or "Yes"
@@ -344,19 +435,20 @@ UIFuncs.Notify = function(msg, duration, color)
     local notif = Instance.new("TextLabel")
     notif.Text = msg
     notif.Size = UDim2.new(1, 0, 0, 30)
-    notif.Position = UDim2.new(0, 0, 0, -35)
-    notif.BackgroundColor3 = color or Config.Theme.Accent
-    notif.TextColor3 = Color3.fromRGB(255,255,255)
+    notif.Position = UDim2.new(0, 0, 1, -35)
+    notif.BackgroundColor3 = color or theme.Accent
+    notif.TextColor3 = theme.Text or Color3.fromRGB(255,255,255)
     notif.Font = Enum.Font.SourceSansBold
     notif.TextSize = 18
     notif.Parent = windowFrame
-    notif.BackgroundTransparency = 0.1
+    notif.BackgroundTransparency = theme.ElementTransparency or 0.1
+    notif.ZIndex = 100
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = notif
-    notif:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.25, true)
+    notif:TweenPosition(UDim2.new(0, 0, 1, -35), "Out", "Quad", 0.25, true)
     task.delay(duration, function()
-        notif:TweenPosition(UDim2.new(0, 0, 0, -35), "In", "Quad", 0.25, true)
+        notif:TweenPosition(UDim2.new(0, 0, 1, 10), "In", "Quad", 0.25, true)
         task.wait(0.3)
         notif:Destroy()
     end)
@@ -393,12 +485,19 @@ downloadBtn.MouseButton1Click:Connect(function()
     local url = urlBox.Text
     local c = PasteAPI("Download", url)
     if c then
-        local gameid = game.PlaceId
-        local path = Config.Games[gameid]
-        if path then
-            writefile(path,c)
-            UIFuncs.Notify("Config downloaded and saved!")
-        end
+        UIFuncs.confirm("Replace existing config?", "Yes", "No",
+            function()
+                local gameid = game.PlaceId
+                local path = Config.Games[gameid]
+                if path then
+                    writefile(path, c)
+                    UIFuncs.Notify("Config downloaded and replaced!")
+                end
+            end,
+            function()
+                UIFuncs.Notify("Config download cancelled.")
+            end
+        )
     else
         UIFuncs.Notify("Failed to download config.")
     end
