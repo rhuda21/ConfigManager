@@ -1,6 +1,7 @@
 local UIFuncs = {}
 
-local dir = "https://raw.githubusercontent.com/rhuda21/ConfigManager/refs/heads/main/"
+--local dir = "https://raw.githubusercontent.com/rhuda21/ConfigManager/refs/heads/main/"
+local dir = "https://dev.azure.com/mhuda25/cf3340da-b3d6-4ad2-aed6-9ee20bb133d6/_apis/git/repositories/81bef30b-e8fb-4079-9377-447383e43685/items?path=/"
 local Config = loadstring(game:HttpGet(dir .. _G.Script))()
 
 local TweenService = game:GetService("TweenService")
