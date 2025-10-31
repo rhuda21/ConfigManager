@@ -46,12 +46,12 @@ Config.Theme = {
 }
 
 Config.Games = {
-    [126884695634066] = Config.path .. "\\Grow a Garden.json",
-    [91867617264223] = Config.path .. "\\Grow a Garden.json",
-    [124977557560410] = Config.path .. "\\Grow a Garden.json",
-    [127742093697776] = Config.path .. "\\Plant Vs Brainrot.json",
-    [16732694052] = Config.path .. "\\Fisch.lua",
-    [131716211654599] = Config.path .. "\\Fisch.lua"
+    [126884695634066] = Config.path .. "/Grow a Garden.json",
+    [91867617264223] = Config.path .. "/Grow a Garden.json",
+    [124977557560410] = Config.path .. "/Grow a Garden.json",
+    [127742093697776] = Config.path .. "/Plant Vs Brainrot.json",
+    [16732694052] = Config.path .. "/Fisch.lua",
+    [131716211654599] = Config.path .. "/Fisch.lua"
 }
 
 Config.exec = function()
