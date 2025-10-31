@@ -51,7 +51,8 @@ Config.Games = {
     [124977557560410] = Config.path .. "/Grow a Garden.json",
     [127742093697776] = Config.path .. "/Plant Vs Brainrot.json",
     [16732694052] = Config.path .. "/Fisch.lua",
-    [131716211654599] = Config.path .. "/Fisch.lua"
+    [131716211654599] = Config.path .. "/Fisch.lua",
+	[121864768012064] = Config.path .. "/Fish it.json"
 }
 
 Config.exec = function()
